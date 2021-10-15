@@ -1,0 +1,125 @@
+sort D_horizontal = struct right| middle| left;
+sort D_vertical = struct lowermost | below_standard | standard | above_standard | uppermost;
+sort dir_horizontal = struct horizontal_motor_left| horizontal_motor_off | horizontal_motor_right;
+sort dir_vertical = struct vertical_motor_down | vertical_motor_off | vertical_motor_up;
+act 
+	send_horizontal: D_horizontal;
+	send_vertical: D_vertical;
+	recv_horizontal: D_horizontal;
+	recv_vertical: D_vertical;
+	comm_horizontal: D_horizontal;
+	comm_vertical: D_vertical;
+
+	horizontal_brake: Bool;
+	vertical_brake: Bool;
+	horizontal_motor: dir_horizontal;
+	vertical_motor: dir_vertical;
+
+	send_dock, recv_dock, comm_dock;
+	send_up_press, send_up_release ,send_down_press, send_down_release, send_stop, send_resume, send_reset, send_undock;
+	recv_up_press, recv_up_release ,recv_down_press, recv_down_release, recv_stop, recv_resume, recv_reset, recv_undock;
+	comm_up_press, comm_up_release ,comm_down_press, comm_down_release, comm_stop, comm_resume, comm_reset, comm_undock;
+
+
+	move_up, move_down, move_left, move_right;
+	
+	send_clear_standard, recv_clear_standard, comm_clear_standard;
+	send_reset_standard, recv_reset_standard, comm_reset_standard;
+
+proc
+%%sensor%%
+	SENSOR = ((sum d:D_horizontal. send_horizontal(d)) + (sum d:D_vertical. send_vertical(d)) + send_dock + recv_reset_standard + recv_clear_standard).SENSOR;
+
+%%console%%
+	CONSOLE = (send_up_press.send_up_release + send_down_press.send_down_release + send_stop + send_resume + send_reset + send_undock).CONSOLE;
+
+
+%%controller%%
+
+%%moving up or down outside the scanner,or moving right inside the scanner, without emergency
+
+	MOVING_UP = recv_up_release.vertical_motor(vertical_motor_off).vertical_brake(true)
+				 + (sum d:D_vertical.((d!=uppermost)->recv_vertical(d).move_up.MOVING_UP<> 
+					recv_vertical(d).vertical_motor(vertical_motor_off).vertical_brake(true).recv_up_release));
+	MOV_UP = (sum d:D_vertical.((d!=uppermost)->
+			recv_vertical(d).vertical_brake(false).vertical_motor(vertical_motor_up).MOVING_UP
+			<>recv_vertical(d).recv_up_release));
+
+
+	MOVING_UP_TO_STANDARD = recv_up_release.vertical_motor(vertical_motor_off).vertical_brake(true)
+				 + (sum d:D_vertical.((d!=uppermost && d!= above_standard && d!=standard)-> 
+					recv_vertical(d).move_up.MOVING_UP_TO_STANDARD <> 
+					recv_vertical(d).vertical_motor(vertical_motor_off).vertical_brake(true).recv_up_release));
+	MOV_UP_TO_STANDARD = (sum d:D_vertical.((d!=uppermost && d!= above_standard && d!=standard)->
+			recv_vertical(d).vertical_brake(false).vertical_motor(vertical_motor_up).MOVING_UP_TO_STANDARD
+			<>recv_vertical(d).recv_up_release));
+
+
+	MOVING_DOWN = recv_down_release.vertical_motor(vertical_motor_off).vertical_brake(true)
+				 + (sum d:D_vertical.((d!=lowermost)->recv_vertical(d).move_down.MOVING_DOWN<> 
+					recv_vertical(d).vertical_motor(vertical_motor_off).vertical_brake(true).recv_down_release));
+	MOV_DOWN = (sum d:D_vertical.((d!=lowermost)->
+			recv_vertical(d).vertical_brake(false).vertical_motor(vertical_motor_down).MOVING_DOWN
+			<>recv_vertical(d).recv_down_release));
+
+
+%not used
+%	MOVING_DOWN_TO_STANDARD = recv_down_release.vertical_motor(vertical_motor_off).vertical_brake(true)
+%				 + (sum d:D_vertical.((d==uppermost || d== above_standard)-> 
+%					recv_vertical(d).move_down.MOVING_DOWN_TO_STANDARD <> 
+%					recv_vertical(d).vertical_motor(vertical_motor_off).vertical_brake(true).recv_down_release));
+%	MOV_DOWN_TO_STANDARD = (sum d:D_vertical.((d==uppermost || d== above_standard)->
+%			recv_vertical(d).vertical_brake(false).vertical_motor(vertical_motor_down).MOVING_DOWN_TO_STANDARD
+%			<>recv_vertical(d).recv_down_release));
+
+	MOVING_RIGHT = recv_down_release.horizontal_motor(horizontal_motor_off).horizontal_brake(true)
+				+ (sum d:D_horizontal.((d!=right)->recv_horizontal(d).move_right.MOVING_RIGHT<> 
+				recv_horizontal(d).horizontal_motor(horizontal_motor_off).horizontal_brake(true).recv_down_release));
+
+%already checked
+	MOV_RIGHT = horizontal_brake(false).horizontal_motor(horizontal_motor_right).MOVING_RIGHT;
+%	MOV_RIGHT = (sum d:D_horizontal.((d!=right)->
+%			D_horizontal(d).horizontal_brake(false).horizontal_motor(horizontal_motor_right).MOVING_RIGHT
+%			<>recv_horizontal(d).recv_down_release));
+
+
+%%moving left, with emergency
+	MOVING_LEFT = 
+			recv_stop.horizontal_motor(horizontal_motor_off).C_EMERGENCY
+			+ (sum d:D_horizontal.((d!=left)->recv_horizontal(d).move_left.MOVING_LEFT  <> 
+			recv_horizontal(d).horizontal_motor(horizontal_motor_off).horizontal_brake(true).C_DOCKED_CALIBRATED ));
+	
+	MOV_LEFT = recv_up_release.(sum d:D_horizontal.((d!=left)->
+			recv_horizontal(d).horizontal_brake(false).horizontal_motor(horizontal_motor_left).MOVING_LEFT
+			<>recv_horizontal(d).C_DOCKED_CALIBRATED));
+
+
+
+
+	HANDLE_UP = (sum d:D_vertical.(d==standard)-> recv_vertical(d).MOV_LEFT 
+				<> recv_vertical(d).MOV_UP_TO_STANDARD.C_DOCKED_CALIBRATED );
+
+	HANDLE_DOWN = (sum d:D_horizontal.(d==right)-> recv_horizontal(d).MOV_DOWN 
+				<> recv_horizontal(d).MOV_RIGHT);
+
+	C_EMERGENCY = vertical_brake(false).horizontal_brake(false).recv_resume.
+			vertical_brake(true).horizontal_brake(true).C_DOCKED_CALIBRATED;
+
+	C_DOCKED_CALIBRATED = 
+		recv_undock.(sum d:D_horizontal.(d==right)->
+			 recv_horizontal(d).C_UNDOCKED_CALIBRATED 
+			 <> recv_horizontal(d).C_DOCKED_CALIBRATED)
+		          %ignore undock when inside the scanner
+		+ recv_stop.C_EMERGENCY + recv_up_press.HANDLE_UP + recv_down_press.HANDLE_DOWN.C_DOCKED_CALIBRATED;
+
+	C_DOCKED_UNCALIBRATED = recv_undock.C_UNDOCKED_UNCALIBRATED + recv_reset.send_reset_standard.C_DOCKED_CALIBRATED +
+					(recv_up_press.MOV_UP + recv_down_press.MOV_DOWN).C_DOCKED_UNCALIBRATED;
+	
+	C_UNDOCKED_UNCALIBRATED = recv_dock.C_DOCKED_UNCALIBRATED + 
+					(recv_up_press.MOV_UP + recv_down_press.MOV_DOWN).C_UNDOCKED_UNCALIBRATED;
+	
+	C_UNDOCKED_CALIBRATED = recv_reset.send_clear_standard.C_UNDOCKED_UNCALIBRATED + recv_dock.C_DOCKED_CALIBRATED + 
+					(recv_up_press.MOV_UP + recv_down_press.MOV_DOWN).C_UNDOCKED_CALIBRATED;
+
+init 
+	C_UNDOCKED_UNCALIBRATED;
