@@ -3,5 +3,7 @@
  <properties>
   <property>NO_DEADLOCK</property>
   <property>no_horizontal_move_when_undocked</property>
+  <property>undocked_horizontal_brake_always_on</property>
+  <property>4_direction_limits</property>
  </properties>
 </root>

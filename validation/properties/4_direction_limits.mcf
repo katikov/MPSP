@@ -1,0 +1,4 @@
+[(true)*.comm_horizontal(right).(!comm_horizontal(middle) && !comm_horizontal(left))*.move_right] false &&
+[(true)*.comm_horizontal(left).(!comm_horizontal(middle) && !comm_horizontal(right))*.move_left] false &&
+[(true)*.comm_vertical(uppermost).(!comm_vertical(lowermost) && !comm_vertical(v_middle) && !comm_cmp_standard(below_standard))*.move_up] false &&
+[(true)*.comm_vertical(lowermost).(!comm_vertical(uppermost) && !comm_vertical(v_middle))*.move_down] false

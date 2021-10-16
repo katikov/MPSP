@@ -1,14 +1,18 @@
 sort D_horizontal = struct right| middle| left;
-sort D_vertical = struct lowermost | below_standard | standard | above_standard | uppermost;
+sort D_vertical = struct lowermost | v_middle | uppermost;
+sort D_standard = struct below_standard | standard | above_standard ;
 sort dir_horizontal = struct horizontal_motor_left| horizontal_motor_off | horizontal_motor_right;
 sort dir_vertical = struct vertical_motor_down | vertical_motor_off | vertical_motor_up;
 act 
 	send_horizontal: D_horizontal;
 	send_vertical: D_vertical;
+	send_cmp_standard: D_standard;
 	recv_horizontal: D_horizontal;
 	recv_vertical: D_vertical;
+	recv_cmp_standard: D_standard;
 	comm_horizontal: D_horizontal;
 	comm_vertical: D_vertical;
+	comm_cmp_standard: D_standard;
 
 	horizontal_brake: Bool;
 	vertical_brake: Bool;
@@ -29,7 +33,7 @@ act
 
 proc
 %%sensor%%
-	SENSOR = ((sum d:D_horizontal. send_horizontal(d)) + (sum d:D_vertical. send_vertical(d)) + send_dock + recv_reset_standard + recv_clear_standard).SENSOR;
+	SENSOR = ((sum d:D_horizontal. send_horizontal(d)) + (sum d:D_vertical. send_vertical(d)) + send_dock + recv_reset_standard + recv_clear_standard + (sum d:D_standard. send_cmp_standard(d))).SENSOR;
 
 %%console%%
 	CONSOLE = (send_up_press.send_up_release + send_down_press.send_down_release + send_stop + send_resume + send_reset + send_undock).CONSOLE;
@@ -48,12 +52,12 @@ proc
 
 
 	MOVING_UP_TO_STANDARD = recv_up_release.vertical_motor(vertical_motor_off).vertical_brake(true)
-				 + (sum d:D_vertical.((d!=uppermost && d!= above_standard && d!=standard)-> 
-					recv_vertical(d).move_up.MOVING_UP_TO_STANDARD <> 
-					recv_vertical(d).vertical_motor(vertical_motor_off).vertical_brake(true).recv_up_release));
-	MOV_UP_TO_STANDARD = (sum d:D_vertical.((d!=uppermost && d!= above_standard && d!=standard)->
-			recv_vertical(d).vertical_brake(false).vertical_motor(vertical_motor_up).MOVING_UP_TO_STANDARD
-			<>recv_vertical(d).recv_up_release));
+				 + (sum d:D_standard.((d==below_standard)-> 
+					recv_cmp_standard(d).move_up.MOVING_UP_TO_STANDARD <> 
+					recv_cmp_standard(d).vertical_motor(vertical_motor_off).vertical_brake(true).recv_up_release));
+	MOV_UP_TO_STANDARD = (sum d:D_standard.((d==below_standard)->
+			recv_cmp_standard(d).vertical_brake(false).vertical_motor(vertical_motor_up).MOVING_UP_TO_STANDARD
+			<>recv_cmp_standard(d).recv_up_release));
 
 
 	MOVING_DOWN = recv_down_release.vertical_motor(vertical_motor_off).vertical_brake(true)
@@ -64,14 +68,7 @@ proc
 			<>recv_vertical(d).recv_down_release));
 
 
-%not used
-%	MOVING_DOWN_TO_STANDARD = recv_down_release.vertical_motor(vertical_motor_off).vertical_brake(true)
-%				 + (sum d:D_vertical.((d==uppermost || d== above_standard)-> 
-%					recv_vertical(d).move_down.MOVING_DOWN_TO_STANDARD <> 
-%					recv_vertical(d).vertical_motor(vertical_motor_off).vertical_brake(true).recv_down_release));
-%	MOV_DOWN_TO_STANDARD = (sum d:D_vertical.((d==uppermost || d== above_standard)->
-%			recv_vertical(d).vertical_brake(false).vertical_motor(vertical_motor_down).MOVING_DOWN_TO_STANDARD
-%			<>recv_vertical(d).recv_down_release));
+
 
 	MOVING_RIGHT = recv_down_release.horizontal_motor(horizontal_motor_off).horizontal_brake(true)
 				+ (sum d:D_horizontal.((d!=right)->recv_horizontal(d).move_right.MOVING_RIGHT<> 
@@ -97,8 +94,8 @@ proc
 
 
 
-	HANDLE_UP = (sum d:D_vertical.(d==standard)-> recv_vertical(d).MOV_LEFT 
-				<> recv_vertical(d).MOV_UP_TO_STANDARD.C_DOCKED_CALIBRATED );
+	HANDLE_UP = (sum d:D_standard.(d==standard)-> recv_cmp_standard(d).MOV_LEFT 
+				<> recv_cmp_standard(d).MOV_UP_TO_STANDARD.C_DOCKED_CALIBRATED );
 
 	HANDLE_DOWN = (sum d:D_horizontal.(d==right)-> recv_horizontal(d).MOV_DOWN 
 				<> recv_horizontal(d).MOV_RIGHT);
@@ -145,7 +142,7 @@ init
 	allow({
 		comm_horizontal,comm_vertical,comm_dock,comm_up_press,comm_up_release,comm_down_press,comm_down_release,
 		comm_stop,comm_resume,comm_reset,comm_undock,comm_clear_standard,comm_reset_standard,
-		move_up, move_down, move_left, move_right, act_dock, act_undock,
+		move_up, move_down, move_left, move_right, act_dock, act_undock,comm_cmp_standard,
 		horizontal_brake, vertical_brake, horizontal_motor, vertical_motor
 	},
 	comm({
@@ -161,7 +158,8 @@ init
 		send_reset|recv_reset -> comm_reset,
 		send_undock|recv_undock -> comm_undock,
 		send_clear_standard|recv_clear_standard -> comm_clear_standard,
-		send_reset_standard|recv_reset_standard -> comm_reset_standard
+		send_reset_standard|recv_reset_standard -> comm_reset_standard,
+		send_cmp_standard | recv_cmp_standard -> comm_cmp_standard
 	},
 		C_UNDOCKED_UNCALIBRATED || SENSOR || CONSOLE
 	));

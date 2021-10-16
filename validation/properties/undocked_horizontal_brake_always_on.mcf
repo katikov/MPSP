@@ -1,0 +1,2 @@
+[((!act_dock)*.act_dock.(!act_undock)*.act_undock)*.(!act_dock)*.horizontal_brake(false)] false &&
+[((!act_dock)*.act_dock.(!act_undock)*.act_undock)*.(!act_dock)*.act_dock.(!act_undock && !horizontal_brake(false))*.horizontal_brake(false).(!act_undock && !horizontal_brake(true))*.act_undock] false
