@@ -1,0 +1,1 @@
+[((!act_dock)*.act_dock.(!act_undock)*.act_undock)*.(!act_dock)*.(move_left|| move_right)] false

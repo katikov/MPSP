@@ -22,6 +22,7 @@ act
 
 
 	move_up, move_down, move_left, move_right;
+	act_dock, act_undock;
 	
 	send_clear_standard, recv_clear_standard, comm_clear_standard;
 	send_reset_standard, recv_reset_standard, comm_reset_standard;
@@ -107,19 +108,60 @@ proc
 
 	C_DOCKED_CALIBRATED = 
 		recv_undock.(sum d:D_horizontal.(d==right)->
-			 recv_horizontal(d).C_UNDOCKED_CALIBRATED 
+			 recv_horizontal(d).act_undock.C_UNDOCKED_CALIBRATED 
 			 <> recv_horizontal(d).C_DOCKED_CALIBRATED)
 		          %ignore undock when inside the scanner
 		+ recv_stop.C_EMERGENCY + recv_up_press.HANDLE_UP + recv_down_press.HANDLE_DOWN.C_DOCKED_CALIBRATED;
 
-	C_DOCKED_UNCALIBRATED = recv_undock.C_UNDOCKED_UNCALIBRATED + recv_reset.send_reset_standard.C_DOCKED_CALIBRATED +
+	C_DOCKED_UNCALIBRATED = recv_undock.act_undock.C_UNDOCKED_UNCALIBRATED + 
+					recv_reset.send_reset_standard.C_DOCKED_CALIBRATED +
 					(recv_up_press.MOV_UP + recv_down_press.MOV_DOWN).C_DOCKED_UNCALIBRATED;
 	
-	C_UNDOCKED_UNCALIBRATED = recv_dock.C_DOCKED_UNCALIBRATED + 
+	C_UNDOCKED_UNCALIBRATED = recv_dock.act_dock.C_DOCKED_UNCALIBRATED + 
 					(recv_up_press.MOV_UP + recv_down_press.MOV_DOWN).C_UNDOCKED_UNCALIBRATED;
 	
-	C_UNDOCKED_CALIBRATED = recv_reset.send_clear_standard.C_UNDOCKED_UNCALIBRATED + recv_dock.C_DOCKED_CALIBRATED + 
+	C_UNDOCKED_CALIBRATED = recv_reset.send_clear_standard.C_UNDOCKED_UNCALIBRATED +
+					 recv_dock.act_dock.C_DOCKED_CALIBRATED + 
 					(recv_up_press.MOV_UP + recv_down_press.MOV_DOWN).C_UNDOCKED_CALIBRATED;
 
+
+%	send_dock, recv_dock, comm_dock;
+%	send_up_press, send_up_release ,send_down_press, send_down_release, send_stop, send_resume, send_reset, send_undock;
+%	recv_up_press, recv_up_release ,recv_down_press, recv_down_release, recv_stop, recv_resume, recv_reset, recv_undock;
+%	comm_up_press, comm_up_release ,comm_down_press, comm_down_release, comm_stop, comm_resume, comm_reset, comm_undock;
+%
+%
+%	move_up, move_down, move_left, move_right;
+%	
+%	send_clear_standard, recv_clear_standard, comm_clear_standard;
+%	send_reset_standard, recv_reset_standard, comm_reset_standard;
+
+%	horizontal_brake: Bool;
+%	vertical_brake: Bool;
+%	horizontal_motor: dir_horizontal;
+%	vertical_motor: dir_vertical;
+
 init 
-	C_UNDOCKED_UNCALIBRATED;
+	allow({
+		comm_horizontal,comm_vertical,comm_dock,comm_up_press,comm_up_release,comm_down_press,comm_down_release,
+		comm_stop,comm_resume,comm_reset,comm_undock,comm_clear_standard,comm_reset_standard,
+		move_up, move_down, move_left, move_right, act_dock, act_undock,
+		horizontal_brake, vertical_brake, horizontal_motor, vertical_motor
+	},
+	comm({
+		send_horizontal|recv_horizontal -> comm_horizontal,
+		send_vertical|recv_vertical -> comm_vertical,
+		send_dock|recv_dock -> comm_dock,
+		send_up_press|recv_up_press -> comm_up_press,
+		send_up_release|recv_up_release -> comm_up_release,
+		send_down_press|recv_down_press -> comm_down_press,
+		send_down_release|recv_down_release -> comm_down_release,
+		send_stop|recv_stop -> comm_stop,
+		send_resume|recv_resume -> comm_resume,
+		send_reset|recv_reset -> comm_reset,
+		send_undock|recv_undock -> comm_undock,
+		send_clear_standard|recv_clear_standard -> comm_clear_standard,
+		send_reset_standard|recv_reset_standard -> comm_reset_standard
+	},
+		C_UNDOCKED_UNCALIBRATED || SENSOR || CONSOLE
+	));

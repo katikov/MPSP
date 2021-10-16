@@ -1,4 +1,7 @@
 <root>
  <spec>validation_spec.mcrl2</spec>
- <properties/>
+ <properties>
+  <property>NO_DEADLOCK</property>
+  <property>no_horizontal_move_when_undocked</property>
+ </properties>
 </root>
