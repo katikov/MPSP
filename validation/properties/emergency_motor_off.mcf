@@ -1,2 +1,4 @@
 [true*.comm_stop.(!comm_resume)*.(vertical_motor(vertical_motor_down)|vertical_motor(vertical_motor_up) )]false &&
-[true*.(vertical_motor(vertical_motor_down)|vertical_motor(vertical_motor_up) ).(!vertical_motor(vertical_motor_off))*.comm_stop]false
+[true*.(vertical_motor(vertical_motor_down)|vertical_motor(vertical_motor_up) ).(!vertical_motor(vertical_motor_off))*.comm_stop]false &&
+[true*.comm_stop.(!comm_resume)*.(horizontal_motor(horizontal_motor_left)|horizontal_motor(horizontal_motor_right) )]false &&
+[true*.(horizontal_motor(horizontal_motor_left)|horizontal_motor(horizontal_motor_right) ).(!horizontal_motor(horizontal_motor_off))*.comm_stop]false
