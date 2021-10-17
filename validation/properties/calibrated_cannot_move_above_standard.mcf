@@ -1,0 +1,2 @@
+[((true*.act_dock.(!act_undock)*.comm_reset_standard) ).(!act_undock && !comm_clear_standard)*.!comm_cmp_standard(below_standard).move_up]false &&
+[((true*.comm_reset_standard.(!comm_clear_standard)*.act_dock)).(!act_undock && !comm_clear_standard)*.!comm_cmp_standard(below_standard).move_up]false

@@ -9,5 +9,9 @@
   <property>vertical_motor_off_followed_by_brake</property>
   <property>emergency_brake_released</property>
   <property>docked_undock_at_rightmost</property>
+  <property>calibrated_cannot_move_above_standard</property>
+  <property>uncalibrated_no_horizontal_move</property>
+  <property>emergency_motor_off</property>
+  <property>mov_when_motor_on</property>
  </properties>
 </root>

@@ -1,0 +1,2 @@
+[true*.comm_stop.(!comm_resume)*.(vertical_motor(vertical_motor_down)|vertical_motor(vertical_motor_up) )]false &&
+[true*.(vertical_motor(vertical_motor_down)|vertical_motor(vertical_motor_up) ).(!vertical_motor(vertical_motor_off))*.comm_stop]false

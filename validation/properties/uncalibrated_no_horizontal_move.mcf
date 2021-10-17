@@ -1,0 +1,1 @@
+[(true*.comm_clear_standard)*.(!comm_reset_standard).(move_left|| move_right)] false
