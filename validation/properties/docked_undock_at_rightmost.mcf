@@ -1,0 +1,3 @@
+[(true*.comm_clear_standard)*.(!comm_reset_standard)*.move_left] false &&
+[((true*.act_dock.(!act_undock)*.comm_reset_standard) ).(!act_undock && !comm_clear_standard)*.!comm_horizontal(right).act_undock]false && 
+[((true*.comm_reset_standard.(!comm_clear_standard)*.act_dock) ).(!act_undock && !comm_clear_standard)*.!comm_horizontal(right).act_undock]false

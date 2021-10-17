@@ -1,0 +1,4 @@
+[true*.horizontal_brake(true).(!horizontal_brake(false))*.(horizontal_motor(horizontal_motor_left) ||horizontal_motor(horizontal_motor_right))] false &&
+[true*.(horizontal_motor(horizontal_motor_left) ||horizontal_motor(horizontal_motor_right)).(!horizontal_motor(horizontal_motor_off))*.horizontal_brake(true)] false &&
+[true*.vertical_brake(true).(!vertical_brake(false))*.(vertical_motor(vertical_motor_up) ||vertical_motor(vertical_motor_down))] false &&
+[true*.(vertical_motor(vertical_motor_up) ||vertical_motor(vertical_motor_down)).(!vertical_motor(vertical_motor_off))*.vertical_brake(true)] false

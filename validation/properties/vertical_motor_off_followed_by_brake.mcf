@@ -1,0 +1,1 @@
+[true*.vertical_motor(vertical_motor_off).(!vertical_brake(true))] false

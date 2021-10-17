@@ -1,0 +1,4 @@
+[true*.comm_stop.(!comm_resume && !vertical_brake(false))*.comm_resume]false &&
+[true*.comm_stop.(!comm_resume && !horizontal_brake(false))*.comm_resume]false &&
+[true*.comm_stop.(!comm_resume)*.vertical_brake(true)]false &&
+[true*.comm_stop.(!comm_resume)*.horizontal_brake(true)]false

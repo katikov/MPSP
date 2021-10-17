@@ -2,8 +2,12 @@
  <spec>validation_spec.mcrl2</spec>
  <properties>
   <property>NO_DEADLOCK</property>
-  <property>no_horizontal_move_when_undocked</property>
+  <property>undocked_no_horizontal_move</property>
   <property>undocked_horizontal_brake_always_on</property>
   <property>4_direction_limits</property>
+  <property>brake_off_when_motor_on</property>
+  <property>vertical_motor_off_followed_by_brake</property>
+  <property>emergency_brake_released</property>
+  <property>docked_undock_at_rightmost</property>
  </properties>
 </root>
