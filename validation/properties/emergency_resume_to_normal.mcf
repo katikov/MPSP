@@ -1,0 +1,4 @@
+[true*.recv_resume]<comm_stop>true &&
+[true*.recv_resume]<comm_up_press>true &&
+[true*.recv_resume]<comm_down_press>true &&
+[true*.recv_resume]<recv_undock>true

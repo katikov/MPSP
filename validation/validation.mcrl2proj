@@ -13,5 +13,7 @@
   <property>uncalibrated_no_horizontal_move</property>
   <property>emergency_motor_off</property>
   <property>mov_when_motor_on</property>
+  <property>emergency_must_by_stop_button</property>
+  <property>emergency_resume_to_normal</property>
  </properties>
 </root>
