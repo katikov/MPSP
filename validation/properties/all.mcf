@@ -1,0 +1,44 @@
+[true*]<true> true&&
+[((!act_dock)*.act_dock.(!act_undock)*.act_undock)*.(!act_dock)*.(move_left|| move_right)] false &&
+[((!act_dock)*.act_dock.(!act_undock)*.act_undock)*.(!act_dock)*.horizontal_brake(false)] false &&
+[((!act_dock)*.act_dock.(!act_undock)*.act_undock)*.(!act_dock)*.act_dock.(!act_undock && !horizontal_brake(false))*.horizontal_brake(false).(!act_undock && !horizontal_brake(true))*.act_undock] false&&
+[(true)*.comm_horizontal(right).(!comm_horizontal(middle) && !comm_horizontal(left))*.move_right] false &&
+[(true)*.comm_horizontal(left).(!comm_horizontal(middle) && !comm_horizontal(right))*.move_left] false &&
+[(true)*.comm_vertical(uppermost).(!comm_vertical(lowermost) && !comm_vertical(v_middle) && !comm_cmp_standard(below_standard))*.move_up] false &&
+[(true)*.comm_vertical(lowermost).(!comm_vertical(uppermost) && !comm_vertical(v_middle))*.move_down] false&&
+[true*.horizontal_brake(true).(!horizontal_brake(false))*.(horizontal_motor(horizontal_motor_left) ||horizontal_motor(horizontal_motor_right))] false &&
+[true*.(horizontal_motor(horizontal_motor_left) ||horizontal_motor(horizontal_motor_right)).(!horizontal_motor(horizontal_motor_off))*.horizontal_brake(true)] false &&
+[true*.vertical_brake(true).(!vertical_brake(false))*.(vertical_motor(vertical_motor_up) ||vertical_motor(vertical_motor_down))] false &&
+[true*.(vertical_motor(vertical_motor_up) ||vertical_motor(vertical_motor_down)).(!vertical_motor(vertical_motor_off))*.vertical_brake(true)] false&&
+[true*.vertical_motor(vertical_motor_off).(!vertical_brake(true))] false&&
+[true*.comm_stop.(!comm_resume && !vertical_brake(false))*.comm_resume]false &&
+[true*.comm_stop.(!comm_resume && !horizontal_brake(false))*.comm_resume]false &&
+[true*.comm_stop.(!comm_resume)*.vertical_brake(true)]false &&
+[true*.comm_stop.(!comm_resume)*.horizontal_brake(true)]false &&
+[(true*.comm_clear_standard)*.(!comm_reset_standard)*.move_left] false &&
+[((true*.act_dock.(!act_undock)*.comm_reset_standard) ).(!act_undock && !comm_clear_standard)*.!comm_horizontal(right).act_undock]false && 
+[((true*.comm_reset_standard.(!comm_clear_standard)*.act_dock) ).(!act_undock && !comm_clear_standard)*.!comm_horizontal(right).act_undock]false&&
+[((true*.act_dock.(!act_undock)*.comm_reset_standard) ).(!act_undock && !comm_clear_standard)*.!comm_cmp_standard(below_standard).move_up]false &&
+[((true*.comm_reset_standard.(!comm_clear_standard)*.act_dock)).(!act_undock && !comm_clear_standard)*.!comm_cmp_standard(below_standard).move_up]false &&
+[(true*.comm_clear_standard)*.(!comm_reset_standard).(move_left|| move_right)] false&&
+[true*.comm_stop.(!comm_resume)*.(vertical_motor(vertical_motor_down)||vertical_motor(vertical_motor_up) )]false &&
+[true*.(vertical_motor(vertical_motor_down)||vertical_motor(vertical_motor_up) ).(!vertical_motor(vertical_motor_off))*.comm_stop]false &&
+[true*.comm_stop.(!comm_resume)*.(horizontal_motor(horizontal_motor_left)||horizontal_motor(horizontal_motor_right) )]false &&
+[true*.(horizontal_motor(horizontal_motor_left)||horizontal_motor(horizontal_motor_right) ).(!horizontal_motor(horizontal_motor_off))*.comm_stop.!horizontal_motor(horizontal_motor_off)]false&&
+[(true*.(vertical_motor(vertical_motor_down)||vertical_motor(vertical_motor_off)))*.(!vertical_motor(vertical_motor_up))*.move_up ] false &&
+[(true*.vertical_motor(vertical_motor_off))*.(!vertical_motor(vertical_motor_up) && !vertical_motor(vertical_motor_down))*.(move_up||move_down) ] false && 
+[(true*.(vertical_motor(vertical_motor_up)||vertical_motor(vertical_motor_off)))*.(!vertical_motor(vertical_motor_down))*.move_down ] false &&
+[(true*.(horizontal_motor(horizontal_motor_left)||horizontal_motor(horizontal_motor_off)))*.(!horizontal_motor(horizontal_motor_right))*.move_right ] false &&
+[(true*.horizontal_motor(horizontal_motor_off))*.(!horizontal_motor(horizontal_motor_left)&&! horizontal_motor(horizontal_motor_right))*.(move_right||move_left) ] false && 
+[(true*.(horizontal_motor(horizontal_motor_right)||horizontal_motor(horizontal_motor_off)))*.(!horizontal_motor(horizontal_motor_left))*.move_left ] false &&
+[(true*.comm_resume)*.(!comm_stop)*.comm_resume]false &&
+[true*.recv_resume]<comm_stop>true &&
+[true*.recv_resume]<comm_up_press>true &&
+[true*.recv_resume]<comm_down_press>true &&
+[true*.recv_resume]<recv_undock>true &&
+[(true*.act_dock)*.(!act_undock)*.comm_reset]<comm_reset_standard>true &&
+[(true*.act_undock)*.(!act_dock)*.comm_reset.(!comm_clear_standard)]false &&
+[true*.comm_down_press.(comm_vertical(v_middle)|| comm_vertical(uppermost))]<(!comm_down_release &&!comm_vertical(lowermost))*.move_down> true &&
+<true*.move_left> true && <true*.move_right> true && <true*.move_up> true && <true*.move_up> true &&
+[true*.comm_up_press.comm_cmp_standard(standard)]<comm_up_release.(!comm_horizontal(left))*.move_left> true && 
+[true*.comm_down_press.(comm_horizontal(left)||comm_horizontal(middle))]<(!comm_horizontal(right) && !comm_down_release)*.move_right> true

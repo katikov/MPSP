@@ -21,5 +21,6 @@
   <property>4_direction_can_move</property>
   <property>docked_standard_height_press_up_move_left</property>
   <property>docked_standard_inside_press_down_move_right</property>
+  <property>all</property>
  </properties>
 </root>
