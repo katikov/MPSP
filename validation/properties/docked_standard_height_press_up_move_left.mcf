@@ -1,0 +1,1 @@
+[true*.comm_up_press.comm_cmp_standard(standard)]<comm_up_release.(!comm_horizontal(left))*.move_left> true

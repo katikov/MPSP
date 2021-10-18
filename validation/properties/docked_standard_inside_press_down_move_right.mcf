@@ -1,0 +1,1 @@
+[true*.comm_down_press.(comm_horizontal(left)||comm_horizontal(middle))]<(!comm_horizontal(right) && !comm_down_release)*.move_right> true

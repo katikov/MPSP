@@ -1,0 +1,1 @@
+[(true*.act_undock)*.(!act_dock)*.comm_reset.(!comm_clear_standard)]false

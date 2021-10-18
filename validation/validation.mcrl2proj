@@ -15,5 +15,11 @@
   <property>mov_when_motor_on</property>
   <property>emergency_must_by_stop_button</property>
   <property>emergency_resume_to_normal</property>
+  <property>docked_reset_standard</property>
+  <property>undocked_reset_forget</property>
+  <property>press_down_then_move_down</property>
+  <property>4_direction_can_move</property>
+  <property>docked_standard_height_press_up_move_left</property>
+  <property>docked_standard_inside_press_down_move_right</property>
  </properties>
 </root>
